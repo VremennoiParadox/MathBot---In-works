@@ -282,7 +282,9 @@ MathBot tries to start Ollama automatically. If that fails:
 **macOS only** for running and packaging. On a Mac:
 
 ```bash
+chmod +x setup.sh build.sh verify_build.sh   # only if ./setup.sh says "permission denied"
 ./setup.sh
+# or: bash setup.sh
 source .venv/bin/activate
 python main.py
 ```
