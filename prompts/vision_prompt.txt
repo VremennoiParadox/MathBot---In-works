@@ -3,8 +3,9 @@ You are a vision assistant reading a screenshot from a math tutoring website (Sp
 TASK:
 1. Read ALL visible question text exactly as shown.
 2. Classify answer_type as exactly one of: number, multiple_choice, expression, graph
-3. List every visible number, label, unit, and constraint (e.g. "isosceles", "angles sum to 180°").
-4. State clearly what the question is asking the student to find or select.
+3. Set contains_graph to true if the image contains any chart, graph, plotted function, coordinate axes, bar chart, pie chart, or scatter plot. Set contains_graph to false if the question contains only text, numbers, geometric shapes, or diagrams without coordinate axes.
+4. List every visible number, label, unit, and constraint (e.g. "isosceles", "angles sum to 180°").
+5. State clearly what the question is asking the student to find or select.
 
 OUTPUT RULES (CRITICAL):
 - Return ONLY a single valid JSON object. No markdown, no preamble, no explanation, no code fences.
@@ -13,6 +14,7 @@ OUTPUT RULES (CRITICAL):
 {
   "question_text": "<full question as readable text>",
   "answer_type": "number|multiple_choice|expression|graph",
+  "contains_graph": true,
   "visual_elements": "<brief description of diagrams/charts/UI>",
   "extracted_values": ["<each number or label as string>"],
   "constraints": ["<any explicit constraints>"],
@@ -20,4 +22,4 @@ OUTPUT RULES (CRITICAL):
 }
 
 If multiple choice options are visible, include them in extracted_values as "A: ...", "B: ...", etc.
-If answer_type is graph, set answer_type to "graph" and describe axes in visual_elements.
+If answer_type is graph, set answer_type to "graph", contains_graph to true, and describe axes in visual_elements.

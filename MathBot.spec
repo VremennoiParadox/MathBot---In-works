@@ -14,6 +14,7 @@ a = Analysis(
     datas=[
         ("prompts", "prompts"),
         ("assets", "assets"),
+        ("assets/templates", "assets/templates"),
         ("config.json.default", "."),
         ("templates/README.md", "templates"),
     ],

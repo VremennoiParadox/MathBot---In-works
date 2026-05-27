@@ -382,6 +382,48 @@ class MemoryStore:
 
         return int(_retry_db(_insert))
 
+    def store_rejected_answer(
+        self,
+        session_id: str,
+        question_image: Image.Image,
+        vision_json: dict[str, Any],
+        solve_result: Any,
+        screenshot_path: Path,
+    ) -> int:
+        """
+        Store a rejected submission (wrong answer highlight detected).
+
+        Args:
+            session_id: Active session UUID.
+            question_image: Region screenshot for phash.
+            vision_json: Vision output.
+            solve_result: Attempted SolveResult.
+            screenshot_path: Screenshot path.
+
+        Returns:
+            question_id integer.
+        """
+        qid = self.store_question_answer(
+            session_id,
+            question_image,
+            vision_json,
+            solve_result,
+            screenshot_path,
+            question_type=vision_json.get("answer_type", "standard"),
+            accepted=False,
+        )
+        try:
+            blob = json.loads(_solve_result_blob(solve_result))
+        except json.JSONDecodeError:
+            blob = {"answer": solve_result.answer}
+        blob["rejected"] = True
+        self._conn.execute(
+            "UPDATE answers SET solve_json = ? WHERE question_id = ?",
+            (json.dumps(blob), qid),
+        )
+        self._conn.commit()
+        return qid
+
     def update_answer_accepted(self, question_id: int, accepted: bool) -> None:
         """
         Set automation accepted flag for a stored answer.

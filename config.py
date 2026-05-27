@@ -34,7 +34,16 @@ class SessionStats(TypedDict, total=False):
     model_combo: str | None
 
 
-class AppConfig(TypedDict):
+class RegionDict(TypedDict):
+    """Screen rectangle selected by the user."""
+
+    x: int
+    y: int
+    width: int
+    height: int
+
+
+class AppConfig(TypedDict, total=False):
     """User-facing configuration loaded from config.json."""
 
     vision_model: str
@@ -45,6 +54,12 @@ class AppConfig(TypedDict):
     dry_run: bool
     default_hotkey: str
     graph_hotkey: str
+    selected_region: RegionDict | None
+    change_threshold: int
+    page_ready_stable_duration: float
+    answer_confirmation_timeout: float
+    max_retries_per_question: int
+    inter_character_delay_ms: int
     session_stats: SessionStats
 
 
@@ -80,6 +95,12 @@ DRY_RUN: bool = False
 DEFAULT_HOTKEY: str = "cmd+shift+s"
 GRAPH_HOTKEY: str = "cmd+shift+g"
 SESSION_STATS: SessionStats = {}
+CHANGE_THRESHOLD: int = 10
+PAGE_READY_STABLE_DURATION: float = 1.5
+ANSWER_CONFIRMATION_TIMEOUT: float = 3.0
+MAX_RETRIES_PER_QUESTION: int = 3
+INTER_CHARACTER_DELAY_MS: int = 50
+SELECTED_REGION: RegionDict | None = None
 
 
 def is_frozen() -> bool:
@@ -113,6 +134,9 @@ PROMPTS_DIR: Path = resource_path("prompts")
 BUNDLE_DIR: Path = resource_path(".")
 DEFAULT_CONFIG_PATH: Path = resource_path("config.json.default")
 
+# Re-export after resource_path is defined
+ASSETS_TEMPLATES_DIR = resource_path("assets/templates")
+
 
 def _ensure_writable_dirs() -> None:
     """Create db, screenshots, templates, and exports under Application Support."""
@@ -122,17 +146,17 @@ def _ensure_writable_dirs() -> None:
 
 def seed_templates_from_bundle() -> None:
     """Copy bundled templates/*.png into Application Support if missing."""
-    bundle_templates = resource_path("templates")
-    if not bundle_templates.is_dir():
-        return
     TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
-    for src in bundle_templates.glob("*.png"):
-        dest = TEMPLATES_DIR / src.name
-        if not dest.exists():
-            try:
-                shutil.copy2(src, dest)
-            except OSError as exc:
-                print(f"Could not copy template {src.name}: {exc}")
+    for bundle_templates in (resource_path("templates"), resource_path("assets/templates")):
+        if not bundle_templates.is_dir():
+            continue
+        for src in bundle_templates.glob("*.png"):
+            dest = TEMPLATES_DIR / src.name
+            if not dest.exists():
+                try:
+                    shutil.copy2(src, dest)
+                except OSError as exc:
+                    print(f"Could not copy template {src.name}: {exc}")
 
 
 def _default_config() -> AppConfig:
@@ -158,6 +182,8 @@ def _apply_constants(cfg: AppConfig) -> None:
     """Copy AppConfig fields into module-level typed constants."""
     global VISION_MODEL, SOLVER_MODEL, GRAPH_MODEL, THINK_MODE
     global CONFIDENCE_THRESHOLD, DRY_RUN, DEFAULT_HOTKEY, GRAPH_HOTKEY, SESSION_STATS
+    global CHANGE_THRESHOLD, PAGE_READY_STABLE_DURATION, ANSWER_CONFIRMATION_TIMEOUT
+    global MAX_RETRIES_PER_QUESTION, INTER_CHARACTER_DELAY_MS, SELECTED_REGION
 
     VISION_MODEL = cfg["vision_model"]
     SOLVER_MODEL = cfg["solver_model"]
@@ -168,6 +194,12 @@ def _apply_constants(cfg: AppConfig) -> None:
     DEFAULT_HOTKEY = cfg["default_hotkey"]
     GRAPH_HOTKEY = cfg["graph_hotkey"]
     SESSION_STATS = cfg.get("session_stats", SessionStats())
+    CHANGE_THRESHOLD = int(cfg.get("change_threshold", 10))
+    PAGE_READY_STABLE_DURATION = float(cfg.get("page_ready_stable_duration", 1.5))
+    ANSWER_CONFIRMATION_TIMEOUT = float(cfg.get("answer_confirmation_timeout", 3.0))
+    MAX_RETRIES_PER_QUESTION = int(cfg.get("max_retries_per_question", 3))
+    INTER_CHARACTER_DELAY_MS = int(cfg.get("inter_character_delay_ms", 50))
+    SELECTED_REGION = cfg.get("selected_region")
 
 
 def load_config() -> AppConfig:
@@ -204,7 +236,9 @@ def load_config() -> AppConfig:
         data = dict(_default_config())
 
     merged = _default_config()
-    merged.update({k: v for k, v in data.items() if k in merged or k == "session_stats"})
+    for key, value in data.items():
+        if key in merged or key == "session_stats":
+            merged[key] = value  # type: ignore[literal-required]
     if "session_stats" not in merged:
         merged["session_stats"] = SessionStats()
 

@@ -184,11 +184,13 @@ def _finish_graph_flow(
         out("⏸️  Automation skipped.")
         return False
 
+    region = config.SELECTED_REGION
     ok = automator.run_automation(
         result.answer,
-        question.get("answer_type", "number"),
+        question.get("answer_type", "graph"),
         before_question=full_image,
         dry_run=dry_run,
+        region=region,
     )
     if qid and memory_store:
         try:

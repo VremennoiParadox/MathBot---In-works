@@ -8,14 +8,14 @@
 
 ## How it works
 
-**Step 1 — Capture**  
-Press a hotkey. MathBot takes a screenshot of the question on your screen (Sparx, Corbettmaths, and similar sites).
+**Step 1 — Select region (once per session)**  
+On launch, you draw a rectangle over the question area in your browser. MathBot remembers it in `config.json`.
 
-**Step 2 — Solve (locally)**  
-A local AI model reads the question. A second model solves it and **double-checks** its own answer using a different method. Nothing is sent to the internet.
+**Step 2 — Autonomous loop**  
+MathBot repeatedly: captures that region → reads the question → solves with **two AI passes** → clicks **Answer** → enters the result → checks for ✅/❌ → advances to the next question. No hotkey per question.
 
-**Step 3 — Enter (Phase 3)**  
-If the answer is verified and marked **ready for submit**, MathBot clicks **Answer** and types the result using on-screen button templates.
+**Step 3 — You stay in control**  
+Press **Q** or **Ctrl+C** to stop. If confidence is low, the loop **pauses** and asks you before submitting.
 
 > All AI runs on your Mac through **Ollama**. Your screen content stays on your machine.
 
@@ -94,15 +94,16 @@ Your choices are saved in:
 
 ---
 
-## Hotkeys
+## Controls
 
-| Hotkey | Action |
-|--------|--------|
-| **Cmd+Shift+S** | Solve the current question (terminal output; Phase 1–2) |
-| **Cmd+Shift+G** | **Graph mode** — specialised graph solve (slower; may ask you to confirm) |
-| **M** | Open the **model switcher** |
-| **Cmd+Shift+D** | Toggle **dry-run mode** (shows what would be entered without clicking) |
-| **Q** | Quit MathBot |
+| Key | Action |
+|-----|--------|
+| **Q** | Stop the autonomous solver loop |
+| **Ctrl+C** | Stop and print session summary |
+
+Graph questions are detected **automatically** (OpenCV heuristics + vision `contains_graph` field) — no separate graph hotkey needed.
+
+Set `"dry_run": true` in `config.json` to solve and print answers **without** clicking.
 
 ---
 
@@ -193,17 +194,26 @@ On quit (**Q**), a CSV export is written to:
 
 ---
 
-### Phase 3 setup (UI automation)
+### UI templates (required for clicking)
 
 ```bash
 pip install -r requirements-phase3.txt
+python capture_templates.py
 ```
 
-1. Capture UI templates — see [templates/README.md](templates/README.md).
-2. Copy PNGs to `~/Library/Application Support/MathBot/templates/` (at minimum **`answer_button.png`**).
-3. Enable **Accessibility** for Terminal (mouse/keyboard control).
-4. Test with dry run: press **Cmd+Shift+D** (toggle) or `"dry_run": true` in config.json.
-5. Run `python main.py` and use **Cmd+Shift+S** on a real question.
+This walks you through screenshotting each button from **your** tutoring site. Files are saved to:
+
+`~/Library/Application Support/MathBot/templates/`
+
+See also [assets/templates/README.md](assets/templates/README.md).
+
+Enable **Accessibility** for Terminal, then run:
+
+```bash
+python main.py
+```
+
+Use `"dry_run": true` in config.json for a first test without mouse clicks.
 
 ---
 
@@ -279,9 +289,10 @@ python main.py
 
 | Command | Purpose |
 |---------|---------|
-| `python main.py --self-test` | Smoke test (Ollama + config + optional fixture vision) |
-| `python main.py --solve-once` | One math solve without hotkeys |
-| `python graph_solver.py` | One graph solve from CLI |
+| `python main.py` | Select region → autonomous loop |
+| `python main.py --self-test` | Smoke test (Ollama + imports + optional fixture vision) |
+| `python main.py --loop-once` | Single loop iteration (testing) |
+| `python capture_templates.py` | Guided UI template capture |
 | `pytest tests/` | Unit tests (needs `requirements-phase3.txt` for full suite) |
 | `./build.sh` | Build `dist/MathBot.app` with PyInstaller |
 | `./verify_build.sh` | Run `--self-test` on the built app |

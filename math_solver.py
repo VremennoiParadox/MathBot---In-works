@@ -70,12 +70,19 @@ def solve_question(
     return solve_with_recheck(vision)
 
 
-def solve_with_recheck(question_json: dict[str, Any]) -> SolveResult:
+def solve_with_recheck(
+    question_json: dict[str, Any],
+    *,
+    force_recheck: bool = False,
+    interactive_gate: bool = True,
+) -> SolveResult:
     """
-    Run Pass 1 → Pass 2 (if think_mode) → confidence gate → verified result.
+    Run Pass 1 → Pass 2 (if think_mode or force_recheck) → confidence gate.
 
     Args:
         question_json: Vision extraction dict.
+        force_recheck: Always run Pass 2 even when think_mode is false.
+        interactive_gate: Prompt user on low confidence when True.
 
     Returns:
         SolveResult with final verified answer only.
@@ -87,7 +94,8 @@ def solve_with_recheck(question_json: dict[str, Any]) -> SolveResult:
     if pass1.get("error"):
         return _error_result(str(pass1.get("raw_response", "Pass 1 failed.")))
 
-    if config.THINK_MODE:
+    do_recheck = config.THINK_MODE or force_recheck
+    if do_recheck:
         print("🔍 Pass 2 — rechecking answer…", flush=True)
         pass2 = _run_pass2_recheck(question_json, pass1)
     else:
@@ -98,7 +106,8 @@ def solve_with_recheck(question_json: dict[str, Any]) -> SolveResult:
         question_json,
         pass1,
         pass2,
-        recheck_skipped=not config.THINK_MODE,
+        recheck_skipped=not do_recheck,
+        interactive_gate=interactive_gate,
     )
 
 
@@ -166,6 +175,7 @@ def _merge_passes(
     pass2: dict[str, Any],
     *,
     recheck_skipped: bool,
+    interactive_gate: bool = True,
 ) -> SolveResult:
     """
     Merge Pass 1 and Pass 2, validate, and run the confidence gate.
@@ -221,7 +231,11 @@ def _merge_passes(
         answer_unit=str(unit) if unit else None,
         ready_for_submit=confidence >= config.CONFIDENCE_THRESHOLD,
     )
-    return apply_confidence_gate(result, recheck_skipped)
+    return apply_confidence_gate(
+        result,
+        recheck_skipped,
+        interactive=interactive_gate,
+    )
 
 
 def _log_correction(original: str, corrected: str) -> None:
@@ -236,6 +250,8 @@ def _log_correction(original: str, corrected: str) -> None:
 def apply_confidence_gate(
     result: SolveResult,
     recheck_skipped: bool,
+    *,
+    interactive: bool = True,
 ) -> SolveResult:
     """
     Prompt user when confidence is below threshold.
@@ -243,12 +259,17 @@ def apply_confidence_gate(
     Args:
         result: Candidate solve result.
         recheck_skipped: Whether Pass 2 was skipped.
+        interactive: When False, leave ready_for_submit False for caller prompt.
 
     Returns:
         Result with ready_for_submit updated from user choice.
     """
     if result.confidence >= config.CONFIDENCE_THRESHOLD:
         result.ready_for_submit = True
+        return result
+
+    if not interactive:
+        result.ready_for_submit = False
         return result
 
     print("\n── Low confidence — review before submitting ──")
@@ -262,7 +283,7 @@ def apply_confidence_gate(
     print(f"Final answer: {result.answer}")
     print(f"Confidence: {result.confidence:.2f}")
 
-    choice = input("[S]ubmit / [E]dit / [K]ip? ").strip().lower()
+    choice = input("[S]ubmit best guess / [E]dit answer / [K]ip this question? ").strip().lower()
     if choice == "s":
         result.ready_for_submit = True
     elif choice == "e":

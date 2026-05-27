@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import config
 import graph_solver
 import math_solver
 
@@ -12,6 +13,12 @@ def test_load_graph_prompts_non_empty() -> None:
     p2 = graph_solver.load_graph_recheck_prompt()
     assert "graph" in p1.lower()
     assert "[answer]" in p2
+
+
+def test_vision_prompt_requires_contains_graph() -> None:
+    """Vision prompt schema includes contains_graph."""
+    text = (config.PROMPTS_DIR / "vision_prompt.txt").read_text(encoding="utf-8")
+    assert "contains_graph" in text
 
 
 def test_merge_graph_passes_verified() -> None:
