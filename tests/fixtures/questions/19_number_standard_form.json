@@ -1,0 +1,9 @@
+{
+  "_notes": "Write 3400000 in standard form.",
+  "question_text": "Write 3 400 000 in standard form",
+  "answer_type": "expression",
+  "visual_elements": "standard form prompt",
+  "extracted_values": ["3400000"],
+  "constraints": [],
+  "question_asked": "standard form"
+}

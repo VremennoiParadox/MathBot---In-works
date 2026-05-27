@@ -1,0 +1,9 @@
+{
+  "_notes": "Find missing angle 36° in isosceles triangle.",
+  "question_text": "Two angles are 72° and 72°. Find the third angle.",
+  "answer_type": "number",
+  "visual_elements": "isosceles triangle",
+  "extracted_values": ["72"],
+  "constraints": ["isosceles"],
+  "question_asked": "third angle"
+}

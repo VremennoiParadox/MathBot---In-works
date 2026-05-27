@@ -1,0 +1,9 @@
+{
+  "_notes": "MCQ fraction comparison.",
+  "question_text": "Which fraction is largest?",
+  "answer_type": "multiple_choice",
+  "visual_elements": "options 2/3, 3/5, 5/8",
+  "extracted_values": ["A: 2/3", "B: 3/5", "C: 5/8"],
+  "constraints": [],
+  "question_asked": "largest fraction"
+}

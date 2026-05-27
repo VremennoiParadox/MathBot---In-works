@@ -1,0 +1,9 @@
+{
+  "_notes": "Solve 3x - 2 > 7.",
+  "question_text": "Solve 3x - 2 > 7",
+  "answer_type": "expression",
+  "visual_elements": "inequality",
+  "extracted_values": ["3", "2", "7"],
+  "constraints": [],
+  "question_asked": "range of x"
+}

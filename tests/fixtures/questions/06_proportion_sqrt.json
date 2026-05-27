@@ -1,0 +1,9 @@
+{
+  "_notes": "y proportional to sqrt(x).",
+  "question_text": "y is directly proportional to √x. When x=4, y=6. Find y when x=9.",
+  "answer_type": "number",
+  "visual_elements": "proportion with square root",
+  "extracted_values": ["4", "6", "9"],
+  "constraints": ["y = k√x"],
+  "question_asked": "y when x=9"
+}

@@ -1,0 +1,16 @@
+You previously solved this problem and got [answer].
+
+Now INDEPENDENTLY verify this answer is correct. Use a DIFFERENT method than your first attempt
+(work backwards, substitute into the original equation, or an alternate approach).
+
+CRITICAL: Do not simply confirm the previous answer. You must re-derive or back-check.
+
+[Type-specific rules injected when applicable: geometry angle sums, proportion substitution, algebra plug-in, MCQ consistency]
+
+Return ONLY JSON:
+{
+  "verified": true|false,
+  "corrected_answer": "<final value to submit>",
+  "verification_working": "<independent check steps>",
+  "confidence": 0.0-1.0
+}

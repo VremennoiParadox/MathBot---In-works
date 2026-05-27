@@ -1,0 +1,9 @@
+{
+  "_notes": "y inversely proportional to x.",
+  "question_text": "y is inversely proportional to x. When x=2, y=10. Find y when x=5.",
+  "answer_type": "number",
+  "visual_elements": "inverse proportion",
+  "extracted_values": ["2", "10", "5"],
+  "constraints": ["inversely proportional"],
+  "question_asked": "y when x=5"
+}

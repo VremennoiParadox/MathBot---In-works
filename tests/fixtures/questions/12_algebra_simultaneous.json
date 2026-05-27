@@ -1,0 +1,9 @@
+{
+  "_notes": "Simultaneous: x+y=10, x-y=2 → x=6,y=4.",
+  "question_text": "Solve x + y = 10 and x - y = 2",
+  "answer_type": "expression",
+  "visual_elements": "pair of linear equations",
+  "extracted_values": ["10", "2"],
+  "constraints": [],
+  "question_asked": "x and y"
+}

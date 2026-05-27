@@ -1,0 +1,29 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Local secrets / user config (lives in Application Support, not repo)
+.env
+config.json
+
+# PyInstaller
+*.spec.bak
+
+# Screenshots captured at runtime (optional local copies)
+screenshots/*.png
+!screenshots/.gitkeep

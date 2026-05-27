@@ -1,0 +1,9 @@
+{
+  "_notes": "Basic linear equation; recheck should substitute x=6.",
+  "question_text": "Solve 2x + 5 = 17",
+  "answer_type": "number",
+  "visual_elements": "linear equation",
+  "extracted_values": ["2", "5", "17"],
+  "constraints": [],
+  "question_asked": "value of x"
+}

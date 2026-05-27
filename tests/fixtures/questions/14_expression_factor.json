@@ -1,0 +1,9 @@
+{
+  "_notes": "Factorise x² - 9.",
+  "question_text": "Factorise x² - 9",
+  "answer_type": "expression",
+  "visual_elements": "difference of squares",
+  "extracted_values": ["9"],
+  "constraints": [],
+  "question_asked": "factorised form"
+}

@@ -1,0 +1,9 @@
+{
+  "_notes": "Expand and simplify (x+2)(x+3).",
+  "question_text": "Expand and simplify (x + 2)(x + 3)",
+  "answer_type": "expression",
+  "visual_elements": "algebraic expression",
+  "extracted_values": ["2", "3"],
+  "constraints": [],
+  "question_asked": "simplified expression"
+}

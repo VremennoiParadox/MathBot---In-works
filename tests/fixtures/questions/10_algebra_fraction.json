@@ -1,0 +1,9 @@
+{
+  "_notes": "Solve 3/x = 1/4.",
+  "question_text": "Solve 3/x = 1/4",
+  "answer_type": "number",
+  "visual_elements": "equation with fraction",
+  "extracted_values": ["3", "1", "4"],
+  "constraints": ["x ≠ 0"],
+  "question_asked": "x"
+}

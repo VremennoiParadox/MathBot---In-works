@@ -1,0 +1,9 @@
+{
+  "_notes": "Increase 80 by 15%.",
+  "question_text": "Increase 80 by 15%",
+  "answer_type": "number",
+  "visual_elements": "percentage question",
+  "extracted_values": ["80", "15"],
+  "constraints": [],
+  "question_asked": "new value"
+}

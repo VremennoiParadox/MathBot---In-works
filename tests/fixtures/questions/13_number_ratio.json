@@ -1,0 +1,9 @@
+{
+  "_notes": "Share £200 in ratio 2:3.",
+  "question_text": "Divide 200 in the ratio 2 : 3",
+  "answer_type": "number",
+  "visual_elements": "ratio question",
+  "extracted_values": ["200", "2", "3"],
+  "constraints": [],
+  "question_asked": "larger share"
+}

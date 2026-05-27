@@ -1,0 +1,15 @@
+{
+  "vision_model": "moondream2",
+  "solver_model": "qwen2.5-math:7b",
+  "graph_model": "qwen2.5vl:7b",
+  "think_mode": true,
+  "confidence_threshold": 0.75,
+  "dry_run": false,
+  "default_hotkey": "cmd+shift+s",
+  "graph_hotkey": "cmd+shift+g",
+  "session_stats": {
+    "last_session_id": null,
+    "avg_solve_time_ms": null,
+    "model_combo": null
+  }
+}

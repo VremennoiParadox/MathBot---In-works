@@ -1,0 +1,9 @@
+{
+  "_notes": "Angle at centre twice angle at circumference.",
+  "question_text": "Angle at centre is 80°. Find angle at circumference on same arc.",
+  "answer_type": "number",
+  "visual_elements": "circle theorem diagram",
+  "extracted_values": ["80"],
+  "constraints": ["circle theorem"],
+  "question_asked": "angle at circumference"
+}

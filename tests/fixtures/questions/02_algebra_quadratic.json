@@ -1,0 +1,9 @@
+{
+  "_notes": "Quadratic factorisation.",
+  "question_text": "Solve x² - 5x + 6 = 0",
+  "answer_type": "expression",
+  "visual_elements": "quadratic equation",
+  "extracted_values": ["1", "6"],
+  "constraints": [],
+  "question_asked": "values of x"
+}

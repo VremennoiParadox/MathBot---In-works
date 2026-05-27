@@ -1,0 +1,9 @@
+{
+  "_notes": "Triangle angle sum; y = 180 - 2x.",
+  "question_text": "Write an equation for angle y in terms of x in an isosceles triangle with two angles x",
+  "answer_type": "expression",
+  "visual_elements": "triangle with two equal angles labelled x and y",
+  "extracted_values": ["x", "y"],
+  "constraints": ["isosceles", "angles sum to 180°"],
+  "question_asked": "equation for y in terms of x"
+}

@@ -1,0 +1,9 @@
+{
+  "_notes": "Parallel lines alternate angles.",
+  "question_text": "Angle a and 70° are corresponding angles on parallel lines. Find a.",
+  "answer_type": "number",
+  "visual_elements": "parallel lines diagram",
+  "extracted_values": ["70"],
+  "constraints": ["parallel lines"],
+  "question_asked": "angle a"
+}

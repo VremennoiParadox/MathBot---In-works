@@ -1,0 +1,7 @@
+Re-read this graph image from scratch. You previously answered [answer].
+
+Independently verify by re-identifying axes, scale, and key points. Use a different reading path if possible.
+
+Do not simply confirm the previous answer.
+
+Return ONLY JSON: { "verified": true|false, "corrected_answer": "...", "verification_working": "...", "confidence": 0.0-1.0 }

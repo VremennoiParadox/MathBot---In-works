@@ -1,0 +1,9 @@
+{
+  "_notes": "Exterior angle of triangle.",
+  "question_text": "Exterior angle of a triangle is 110°. The two opposite interior angles are 50° and y. Find y.",
+  "answer_type": "number",
+  "visual_elements": "triangle exterior angle",
+  "extracted_values": ["110", "50"],
+  "constraints": ["exterior angle equals sum of remote interior angles"],
+  "question_asked": "y"
+}

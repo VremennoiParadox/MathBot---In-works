@@ -1,0 +1,9 @@
+{
+  "_notes": "y = kx; direct proportion.",
+  "question_text": "y is directly proportional to x. When x=3, y=12. Find y when x=5.",
+  "answer_type": "number",
+  "visual_elements": "proportion statement",
+  "extracted_values": ["3", "12", "5"],
+  "constraints": ["directly proportional"],
+  "question_asked": "y when x=5"
+}

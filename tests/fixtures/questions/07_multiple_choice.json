@@ -1,0 +1,9 @@
+{
+  "_notes": "MCQ — recheck must justify option not restate.",
+  "question_text": "What is 3/4 + 1/2?",
+  "answer_type": "multiple_choice",
+  "visual_elements": "four radio options",
+  "extracted_values": ["A: 1", "B: 5/4", "C: 4/6", "D: 2/6"],
+  "constraints": [],
+  "question_asked": "correct option"
+}
