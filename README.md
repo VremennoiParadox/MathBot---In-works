@@ -14,8 +14,8 @@ Press a hotkey. MathBot takes a screenshot of the question on your screen (Sparx
 **Step 2 — Solve (locally)**  
 A local AI model reads the question. A second model solves it and **double-checks** its own answer using a different method. Nothing is sent to the internet.
 
-**Step 3 — Enter**  
-MathBot clicks **Answer** and types the verified result into the website for you.
+**Step 3 — Enter (Phase 3)**  
+If the answer is verified and marked **ready for submit**, MathBot clicks **Answer** and types the result using on-screen button templates.
 
 > All AI runs on your Mac through **Ollama**. Your screen content stays on your machine.
 
@@ -33,8 +33,8 @@ MathBot clicks **Answer** and types the verified result into the website for you
 
 | Your Mac RAM | Vision model (reads screen) | Solver model (does maths) | Typical solve time |
 |--------------|----------------------------|---------------------------|--------------------|
-| 8 GB | moondream2 | qwen2.5-math:7b | 10–20 sec |
-| 16 GB | qwen2.5vl:7b | qwen2.5-math:7b | 5–12 sec |
+| 8 GB | moondream:v2 | qwen2.5:7b | 10–20 sec |
+| 16 GB | qwen2.5vl:7b | qwen2.5:7b | 5–12 sec |
 | 16 GB (accuracy focus) | qwen2.5vl:7b | deepseek-r1:14b | 10–20 sec |
 | 32 GB+ | qwen2.5vl:7b | deepseek-r1:14b | 3–8 sec |
 
@@ -98,7 +98,7 @@ Your choices are saved in:
 
 | Hotkey | Action |
 |--------|--------|
-| **Cmd+Shift+S** | Solve the current question and enter the answer |
+| **Cmd+Shift+S** | Solve the current question (terminal output; Phase 1–2) |
 | **Cmd+Shift+G** | **Graph mode** — specialised graph solve (slower; may ask you to confirm) |
 | **M** | Open the **model switcher** |
 | **Cmd+Shift+D** | Toggle **dry-run mode** (shows what would be entered without clicking) |
@@ -139,6 +139,28 @@ Graphs are harder for AI to read than plain sums.
 
 ## Troubleshooting
 
+### `pip install` fails on `pyobjc-core` / `clang` errors
+
+**Cause:** `requirements.txt` includes **pyautogui** (Phase 3 clicking). That pulls **pyobjc**, which must compile C code. Old **Python 3.9** (often from Xcode) plus a new Xcode/clang often fails with `simd_*` / `Wdefault-const-init-var-unsafe` errors.
+
+**Fix (Phase 1–2 — recommended now):**
+
+1. Install a modern Python: `brew install python@3.12`
+2. Recreate the venv with that Python:
+   ```bash
+   cd MathBot
+   rm -rf .venv
+   python3.12 -m venv .venv
+   source .venv/bin/activate
+   python -m pip install --upgrade pip
+   pip install -r requirements-phase12.txt
+   ```
+3. Run: `python main.py`
+
+Install full `requirements.txt` later when you start **Phase 3** (UI automation).
+
+---
+
 ### “MathBot can’t see my screen”
 
 **Cause:** Screen Recording permission is off.
@@ -154,6 +176,50 @@ Graphs are harder for AI to read than plain sums.
 
 **Fix:**  
 **System Settings** → **Privacy & Security** → **Accessibility** → enable **MathBot** → quit and reopen MathBot.
+
+---
+
+### Phase 4 — Memory & verification
+
+MathBot saves every verified answer in:
+
+`~/Library/Application Support/MathBot/db/mathbot.sqlite`
+
+When you see the **same question again** (e.g. “check your work”), it **skips Ollama** and re-uses your stored answer.
+
+On quit (**Q**), a CSV export is written to:
+
+`~/Library/Application Support/MathBot/exports/`
+
+---
+
+### Phase 3 setup (UI automation)
+
+```bash
+pip install -r requirements-phase3.txt
+```
+
+1. Capture UI templates — see [templates/README.md](templates/README.md).
+2. Copy PNGs to `~/Library/Application Support/MathBot/templates/` (at minimum **`answer_button.png`**).
+3. Enable **Accessibility** for Terminal (mouse/keyboard control).
+4. Test with dry run: press **Cmd+Shift+D** (toggle) or `"dry_run": true` in config.json.
+5. Run `python main.py` and use **Cmd+Shift+S** on a real question.
+
+---
+
+### Hotkey does nothing after screenshot (or only a screenshot appears)
+
+**Cause:** The first solve can take **1–3 minutes** while Ollama loads vision + solver models. Older builds also ran the solve on a background thread so Terminal output could look frozen.
+
+**Fix:**
+
+1. Watch the **same Terminal window** where `python main.py` is running — you should see `▶ Hotkey received` then `Reading question…`.
+2. Run a test without the hotkey:
+   ```bash
+   python main.py --solve-once
+   ```
+3. Grant **Accessibility** for Terminal: System Settings → Privacy & Security → **Accessibility** → enable **Terminal** (needed for global hotkeys).
+4. Keep **Ollama running** (`ollama serve` or menu-bar app).
 
 ---
 
@@ -198,6 +264,35 @@ MathBot tries to start Ollama automatically. If that fails:
 | Run setup wizard again | `~/Library/Application Support/MathBot/config.json` |
 | Clear answer history | `~/Library/Application Support/MathBot/db/mathbot.sqlite` |
 | **Full uninstall** | Delete **MathBot.app** from Applications **and** delete the whole folder `~/Library/Application Support/MathBot/` |
+
+---
+
+## Developers (build from source)
+
+**macOS only** for running and packaging. On a Mac:
+
+```bash
+./setup.sh
+source .venv/bin/activate
+python main.py
+```
+
+| Command | Purpose |
+|---------|---------|
+| `python main.py --self-test` | Smoke test (Ollama + config + optional fixture vision) |
+| `python main.py --solve-once` | One math solve without hotkeys |
+| `python graph_solver.py` | One graph solve from CLI |
+| `pytest tests/` | Unit tests (needs `requirements-phase3.txt` for full suite) |
+| `./build.sh` | Build `dist/MathBot.app` with PyInstaller |
+| `./verify_build.sh` | Run `--self-test` on the built app |
+
+After you quit with **Q**, average solve time is saved in `config.json` under `session_stats.avg_solve_time_ms`.
+
+Generate the self-test screenshot fixture:
+
+```bash
+python scripts/make_sample_fixture.py
+```
 
 ---
 

@@ -13,7 +13,7 @@ OLLAMA_HOST: str = "http://localhost:11434"
 OLLAMA_GENERATE_URL: str = f"{OLLAMA_HOST}/api/generate"
 
 # Vision fallback when primary model fails (defined here only — never elsewhere)
-VISION_FALLBACK_MODEL: str = "moondream2"
+VISION_FALLBACK_MODEL: str = "moondream:v2"
 
 # Static thresholds and timing (not in config.json)
 IMAGE_HASH_MATCH_THRESHOLD: int = 8
@@ -120,6 +120,21 @@ def _ensure_writable_dirs() -> None:
         folder.mkdir(parents=True, exist_ok=True)
 
 
+def seed_templates_from_bundle() -> None:
+    """Copy bundled templates/*.png into Application Support if missing."""
+    bundle_templates = resource_path("templates")
+    if not bundle_templates.is_dir():
+        return
+    TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
+    for src in bundle_templates.glob("*.png"):
+        dest = TEMPLATES_DIR / src.name
+        if not dest.exists():
+            try:
+                shutil.copy2(src, dest)
+            except OSError as exc:
+                print(f"Could not copy template {src.name}: {exc}")
+
+
 def _default_config() -> AppConfig:
     """Load defaults from config.json.default shipped with the repo."""
     try:
@@ -165,6 +180,7 @@ def load_config() -> AppConfig:
     global _config, first_run
 
     _ensure_writable_dirs()
+    seed_templates_from_bundle()
 
     if not CONFIG_PATH.exists():
         first_run = True

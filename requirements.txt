@@ -1,3 +1,7 @@
+# Full runtime (Phase 3+ automation needs pyautogui → pyobjc on macOS).
+# For Phase 1–2 only, use: pip install -r requirements-phase12.txt
+# Requires Python 3.11+ — do not use old Xcode Python 3.9.
+
 # --- runtime ---
 mss>=9.0.0
 pyautogui>=0.9.54

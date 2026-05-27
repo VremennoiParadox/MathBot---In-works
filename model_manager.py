@@ -248,10 +248,27 @@ def run_setup_wizard() -> dict:
 
     vision_list, text_list = group_models(models)
     if not vision_list:
-        print("No vision-capable models found. Pull one with:  ollama pull <vision-model>")
+        print("\nNo vision-capable models found in Ollama.")
+        print("Installed models:")
+        for name in models:
+            print(f"  - {name}")
+        print(
+            "\nMathBot needs a model that can read screenshots. Pull one, then run main.py again:\n"
+            "  ollama pull moondream:v2        # small (~1.7 GB), good for 8–12 GB Macs\n"
+            "  ollama pull qwen2.5vl:7b        # better vision (~6 GB)\n"
+        )
         sys.exit(1)
     if not text_list:
-        print("No text-only models found. Pull one with:  ollama pull <solver-model>")
+        print("\nNo text-only solver models found.")
+        print("Installed models:")
+        for name in models:
+            tag = "vision" if is_vision_capable(name) else "text"
+            print(f"  - {name}  [{tag}]")
+        print(
+            "\nPull a math/text solver, then run main.py again:\n"
+            "  ollama pull qwen2.5:7b\n"
+            "  ollama pull mightykatun/qwen2.5-math:7b\n"
+        )
         sys.exit(1)
 
     print("\n=== MathBot Model Selection Wizard ===\n")

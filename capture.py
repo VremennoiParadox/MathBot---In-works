@@ -13,6 +13,24 @@ from PIL import Image
 import config
 
 
+def crop_question_region(full: Image.Image) -> Image.Image:
+    """
+    Crop the upper portion of the screen as the question area (phash identity).
+
+    Args:
+        full: Full-screen PIL image.
+
+    Returns:
+        Cropped question-region image.
+    """
+    width, height = full.size
+    ratio = 0.6
+    if config.QUESTION_REGION and isinstance(config.QUESTION_REGION.get("height_ratio"), (int, float)):
+        ratio = float(config.QUESTION_REGION["height_ratio"])
+    crop_h = max(1, int(height * ratio))
+    return full.crop((0, 0, width, crop_h))
+
+
 def capture_screen() -> tuple[str, str]:
     """
     Capture the full primary display and save a timestamped PNG.

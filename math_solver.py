@@ -48,22 +48,24 @@ def solve_question(
         Verified SolveResult from solve_with_recheck or cache.
     """
     if memory_store is not None and question_hash:
-        try:
-            cached = memory_store.get_cached_answer(question_hash)  # type: ignore[attr-defined]
-            if cached and cached.get("verified"):
-                return SolveResult(
-                    answer=str(cached["answer_value"]),
-                    working=str(cached.get("answer_working", "")),
-                    verification_working=str(cached.get("verification_working", "")),
-                    confidence=float(cached.get("confidence", 1.0)),
-                    recheck_passed=True,
-                    original_answer=None,
-                    was_corrected=False,
-                    answer_unit=cached.get("answer_unit"),
-                    ready_for_submit=True,
-                )
-        except (AttributeError, NotImplementedError):
-            pass
+        cached = memory_store.get_cached_answer(question_hash)
+        if cached and cached.get("verified"):
+            print(
+                f"Memory cache hit (exact phash) — skipping Ollama solver. "
+                f"Answer: {cached['answer_value']!r}",
+                flush=True,
+            )
+            return SolveResult(
+                answer=str(cached["answer_value"]),
+                working=str(cached.get("answer_working", "")),
+                verification_working=str(cached.get("verification_working", "")),
+                confidence=float(cached.get("confidence", 1.0)),
+                recheck_passed=True,
+                original_answer=None,
+                was_corrected=False,
+                answer_unit=cached.get("answer_unit"),
+                ready_for_submit=True,
+            )
 
     return solve_with_recheck(vision)
 
@@ -86,9 +88,10 @@ def solve_with_recheck(question_json: dict[str, Any]) -> SolveResult:
         return _error_result(str(pass1.get("raw_response", "Pass 1 failed.")))
 
     if config.THINK_MODE:
+        print("🔍 Pass 2 — rechecking answer…", flush=True)
         pass2 = _run_pass2_recheck(question_json, pass1)
     else:
-        print("think_mode is false — skipping Pass 2 recheck (less accurate).")
+        print("think_mode is false — skipping Pass 2 recheck (less accurate).", flush=True)
         pass2 = {}
 
     return _merge_passes(
@@ -389,8 +392,13 @@ def _parse_json_response(raw: str) -> dict[str, Any] | None:
     return None
 
 
-def _error_result(message: str) -> SolveResult:
+def error_result(message: str) -> SolveResult:
     """Build a failed SolveResult for terminal display."""
+    return _error_result(message)
+
+
+def _error_result(message: str) -> SolveResult:
+    """Internal failed SolveResult builder."""
     return SolveResult(
         answer="",
         working=message,

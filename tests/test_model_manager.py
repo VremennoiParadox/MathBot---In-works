@@ -7,7 +7,7 @@ import model_manager
 
 def test_is_vision_capable_moondream() -> None:
     """Moondream tag is vision-capable."""
-    assert model_manager.is_vision_capable("moondream2:latest")
+    assert model_manager.is_vision_capable("moondream:v2")
 
 
 def test_is_vision_capable_math_not_vision() -> None:
@@ -17,9 +17,9 @@ def test_is_vision_capable_math_not_vision() -> None:
 
 def test_group_models_splits_lists() -> None:
     """group_models returns disjoint vision and text lists."""
-    models = ["moondream2", "qwen2.5-math:7b", "qwen2.5vl:7b"]
+    models = ["moondream:v2", "qwen2.5:7b", "qwen2.5vl:7b"]
     vision, text = model_manager.group_models(models)
-    assert "moondream2" in vision
+    assert "moondream:v2" in vision
     assert "qwen2.5vl:7b" in vision
-    assert "qwen2.5-math:7b" in text
-    assert "qwen2.5-math:7b" not in vision
+    assert "qwen2.5:7b" in text
+    assert "qwen2.5:7b" not in vision

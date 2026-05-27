@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import base64
+import io
 import json
 import re
 from typing import Any
 
 import requests
+from PIL import Image
 
 import config
 import model_manager
@@ -14,7 +17,24 @@ import model_manager
 _JSON_BLOCK_RE = re.compile(r"\{[\s\S]*\}")
 
 
-def read_question(base64_image: str) -> dict[str, Any]:
+def preprocess_for_vision(image: Image.Image) -> Image.Image:
+    """
+    Boost contrast and upscale low-contrast screenshots before vision API.
+
+    Args:
+        image: Source PIL image.
+
+    Returns:
+        Preprocessed PIL image.
+    """
+    from PIL import ImageEnhance
+
+    w, h = image.size
+    upscaled = image.resize((w * 2, h * 2), Image.Resampling.LANCZOS)
+    return ImageEnhance.Contrast(upscaled).enhance(1.4)
+
+
+def read_question(base64_image: str, *, preprocess: bool = True) -> dict[str, Any]:
     """
     Run vision model on a base64 PNG and return parsed question JSON.
 
@@ -26,6 +46,17 @@ def read_question(base64_image: str) -> dict[str, Any]:
     """
     prompt = _load_vision_prompt()
     model = model_manager.get_vision_model()
+    print(f"   Calling Ollama vision model: {model}", flush=True)
+
+    if preprocess:
+        try:
+            raw = base64.b64decode(base64_image)
+            img = Image.open(io.BytesIO(raw)).convert("RGB")
+            buf = io.BytesIO()
+            preprocess_for_vision(img).save(buf, format="PNG")
+            base64_image = base64.b64encode(buf.getvalue()).decode("utf-8")
+        except (OSError, ValueError) as exc:
+            print(f"Preprocess skipped: {exc}", flush=True)
 
     result = _read_with_model(base64_image, prompt, model)
     if not result.get("error"):
